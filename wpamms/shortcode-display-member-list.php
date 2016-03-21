@@ -10,7 +10,7 @@ function wpamms_shortcode_list() {
 
 	// Check if search string is in address
 	if ( !empty( $_POST['searchbt'] ) ) {
-		$search_string = $_POST['searchbt'];
+		$search_string = sanitize_text_field($_POST['searchbt']);
 		$search_mode = true;
 	} else {
 		$search_string = 'Search...';
@@ -41,7 +41,8 @@ function wpamms_shortcode_list() {
         
         $valid = false;
         if( isset( $_POST['ammp_renewal_captcha'] ) ) {
-
+            $_POST['ammp_renewal_captcha'] = sanitize_text_field($_POST['ammp_renewal_captcha']) ;
+            
             // Variable used to determine if submission is valid
             // Check if captcha text was entered
                     if (empty($_POST['ammp_renewal_captcha'])) {
@@ -98,7 +99,7 @@ function wpamms_shortcode_list() {
 		$member_query .= "or province like '%s' ";
 		$member_query .= "or researchfocus like '%s' ) and ";
 	} elseif ( $search_mode && !$valid) {
-            $output .= '<h5>'.$abortmessage.'</h3>';
+            $output .= '<h5>'.esc_html($abortmessage).'</h3>';
             $search_term = '';
         } else {
             $search_term = '';
@@ -124,29 +125,29 @@ function wpamms_shortcode_list() {
 		// Create row in table for each member
                 foreach ( $members_data as $member_data ) {
                          $output .= '<tr style="background: #FFF">';
-                         $output .= '<td><b>' . $member_data['name'] . '</b><br/><br/>';
+                         $output .= '<td><b>' . esc_html($member_data['name']) . '</b><br/><br/>';
 
                         if( $member_data['photo'] != '') {
                             $output .=  '<a onclick="ammspopup(';
-                            $output .=  "'". $member_data['photo']."'";
+                            $output .=  "'". esc_url($member_data['photo'])."'";
                             $output .=  ')">Photo</a> <br/><br/>';
                         }  
                             
-                        $output .= 'Member ID: ' . $member_data['memberid'] . '<br/>';
-                        $output .= 'Member Since: ' . $member_data['membersince'] . '</td>';
+                        $output .= 'Member ID: ' . esc_html($member_data['memberid']) . '<br/>';
+                        $output .= 'Member Since: ' . esc_html($member_data['membersince']) . '</td>';
                         
-                         $output .= '<td>' . $member_data['institution'] . ' , ' 
-                                    . $member_data['department'] . ' <br/><br/>' 
-                                    . $member_data['city'] . ' , ' 
-                                    . $member_data['province'] . ' <br/><br/>' 
-                                    . $member_data['researchfocus'] . ' </td>';
+                         $output .= '<td>' . esc_html($member_data['institution']) . ' , ' 
+                                    . esc_html($member_data['department']) . ' <br/><br/>' 
+                                    . esc_html($member_data['city']) . ' , ' 
+                                    . esc_html($member_data['province']) . ' <br/><br/>' 
+                                    . esc_html($member_data['researchfocus']) . ' </td>';
 
                         if($member_data['active'] == 1)
                              $output .= '<td>Active Member<br/><br/>';
                         else
                              $output .= '<td><b>EXPIRED</b><br/><br/>';
 
-                         $output .= 'Expiration Date: ' . $member_data['expirationdate'] . '</td></tr>';
+                         $output .= 'Expiration Date: ' . esc_html($member_data['expirationdate']) . '</td></tr>';
                 }
                 
 	} else {
@@ -173,7 +174,7 @@ function wpamms_shortcode_list() {
 		$member_query .= "or province like '%s' ";
 		$member_query .= "or researchfocus like '%s' ) and ";
 	} elseif ( $search_mode && !$valid) {
-            $output .= '<h5>'.$abortmessage.'</h3>';
+            $output .= '<h5>'.esc_html($abortmessage).'</h3>';
             $search_term = '';
         } else {
             $search_term = '';
@@ -199,28 +200,28 @@ function wpamms_shortcode_list() {
 		// Create row in table for each member
                 foreach ( $members_data as $member_data ) {
                          $output .= '<tr style="background: #FFF">';
-                         $output .= '<td><b>' . $member_data['name'] . '</b><br/><br/>';
+                         $output .= '<td><b>' . esc_html($member_data['name']) . '</b><br/><br/>';
 
                         if( $member_data['photo'] != '') {
                             $output .=  '<a onclick="ammspopup(';
-                            $output .=  "'". $member_data['photo']."'";
+                            $output .=  "'". esc_url($member_data['photo'])."'";
                             $output .=  ')">Photo</a> <br/><br/>';
                         }  
-                        $output .= 'Member ID: ' . $member_data['memberid'] . '<br/>';
-                         $output .= 'Member Since: ' . $member_data['membersince'] . '</td>';
+                        $output .= 'Member ID: ' . esc_html($member_data['memberid']) . '<br/>';
+                         $output .= 'Member Since: ' . esc_html($member_data['membersince']) . '</td>';
                         
-                         $output .= '<td>' . $member_data['institution'] . ' , ' 
-                                    . $member_data['department'] . ' <br/><br/>' 
-                                    . $member_data['city'] . ' , ' 
-                                    . $member_data['province'] . ' <br/><br/>' 
-                                    . $member_data['researchfocus'] . ' </td>';
+                         $output .= '<td>' . esc_html($member_data['institution']) . ' , ' 
+                                    . esc_html($member_data['department']) . ' <br/><br/>' 
+                                    . esc_html($member_data['city']) . ' , ' 
+                                    . esc_html($member_data['province']) . ' <br/><br/>' 
+                                    . esc_html($member_data['researchfocus']) . ' </td>';
 
                         if($member_data['active'] == 1)
                              $output .= '<td>Active Member<br/><br/>';
                         else
                              $output .= '<td><b>EXPIRED</b><br/><br/>';
 
-                         $output .= 'Expiration Date: ' . $member_data['expirationdate'] . '</td></tr>';
+                         $output .= 'Expiration Date: ' . esc_html($member_data['expirationdate']) . '</td></tr>';
                 }
                 
 	} else {

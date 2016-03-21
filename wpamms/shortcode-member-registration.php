@@ -12,6 +12,7 @@ function wpamms_shortcode_registration() {
 
         $valid = false;
         if( isset( $_POST['ammp_registration_captcha'] ) ) {
+            $_POST['ammp_registration_captcha'] = sanitize_text_field($_POST['ammp_registration_captcha']) ;
 
             // Variable used to determine if submission is valid
             // Check if captcha text was entered
@@ -62,20 +63,24 @@ function wpamms_shortcode_registration() {
                     // Place all user submitted values in an array
                     $member_data = array();         
                     $member_data['id'] = '';
-                    $member_data['name'] = $_POST['ammsname'] ;
+                    $member_data['name'] = sanitize_text_field($_POST['ammsname']) ;
                     $member_data['memberid'] = '';
-                    $member_data['institution'] = $_POST['institution'] ;
-                    $member_data['department'] = $_POST['department'] ;
-                    $member_data['address'] = $_POST['address'] ;
-                    $member_data['city'] = $_POST['city'];
-                    $member_data['province'] = $_POST['province'] ;
-                    $member_data['postalcode'] = $_POST['postalcode'] ;
-                    $member_data['emailaddress'] = $_POST['emailaddress'] ;
-                    $member_data['phonenumber'] = $_POST['phonenumber'] ;
-                    $member_data['gender'] = $_POST['gender'] ;
-                    $member_data['researchfocus'] = $_POST['researchfocus'] ;
-                    $member_data['photo'] = $_POST['photo'] ;
-                    $member_data['paymentreceipt'] = $_POST['paymentreceipt'] ;
+                    $member_data['institution'] = sanitize_text_field($_POST['institution']) ;
+                    $member_data['department'] = sanitize_text_field($_POST['department']) ;
+                    $member_data['address'] = sanitize_text_field($_POST['address']) ;
+                    $member_data['city'] = sanitize_text_field($_POST['city']);
+                    $member_data['province'] = sanitize_text_field($_POST['province']) ;
+                    $member_data['postalcode'] = sanitize_text_field($_POST['postalcode']) ;
+                    $member_data['emailaddress'] = sanitize_text_field($_POST['emailaddress']) ;
+                    if(is_email($member_data['emailaddress']) == false)
+                        $member_data['emailaddress'] = '';
+                    else
+                        $member_data['emailaddress'] = is_email($member_data['emailaddress']);
+                    $member_data['phonenumber'] = sanitize_text_field($_POST['phonenumber']) ;
+                    $member_data['gender'] = sanitize_text_field($_POST['gender']) ;
+                    $member_data['researchfocus'] = sanitize_text_field($_POST['researchfocus']) ;
+                    $member_data['photo'] = sanitize_text_field($_POST['photo']) ;
+                    $member_data['paymentreceipt'] = sanitize_text_field($_POST['paymentreceipt']) ;
                     $member_data['membersince'] = date("Y-m-d") ;
                     $member_data['expirationdate'] = '' ;
                     $member_data['active'] = '-1' ;
@@ -98,7 +103,7 @@ function wpamms_shortcode_registration() {
                             //var_dump( $movefile);
                             $member_data['paymentreceipt'] = $movefile['url'];
                         } else {
-                            wp_die('Upload PROOF OF PAYMENT Failed! if error persist, contact membership help desk for assistance! ' . $options['membership_admin_email'] );
+                            wp_die('Upload PROOF OF PAYMENT Failed! if error persist, contact membership help desk for assistance! ' . sanitize_email($options['membership_admin_email'] ));
                         }
 
                     }
@@ -114,7 +119,7 @@ function wpamms_shortcode_registration() {
                             //var_dump( $movefile);
                             $member_data['photo'] = $movefile['url'];
                         } else {
-                            wp_die('Upload PHOTO Failed! if error persist, contact membership help desk for assistance! ' . $options['membership_admin_email'] );
+                            wp_die('Upload PHOTO Failed! if error persist, contact membership help desk for assistance! ' . sanitize_email($options['membership_admin_email'] ));
                         }
 
                     }
@@ -127,44 +132,40 @@ function wpamms_shortcode_registration() {
                     if($wpdb->insert_id != false && $wpdb->insert_id >= 1) {
                         $output .= '<h3>SUCCESS.... The Registration Form Had Been Submitted.</h3>';
                         $output .= '<h4>Please Wait 2 x 24 hours (work days) for Admin Verification Process</h4>';
-                        $output .= 'In Case Any Problem Occurs, Please Contact Membership Help Desk at = '. $options['membership_admin_email'];
+                        $output .= 'In Case Any Problem Occurs, Please Contact Membership Help Desk at = '. sanitize_email($options['membership_admin_email']);
 
                         if ($options['send_email_notification']) {
                             $multiple_recipients = array(
-                                $options['membership_admin_email'],
-                                $member_data['emailaddress']
+                                sanitize_email($options['membership_admin_email']),
+                                sanitize_email($member_data['emailaddress'])
                             );
-                            $subj = "[NEW REGISTRATION] ".$options['short_tittle']." Membership Needs Admin Verification Process";
+                            $subj = "[NEW REGISTRATION] ".esc_html($options['short_tittle'])." Membership Needs Admin Verification Process";
                             
                             $body = "Membership Registration Form ";
-                            $body .= "name = " . $member_data['name'] . "\r\n";
-                            $body .= "institution = " . $member_data['institution']  . "\r\n";
-                            $body .= "department = " . $member_data['department']  . "\r\n";
-                            $body .= "address = " . $member_data['address']  . "\r\n";
-                            $body .= "city = " . $member_data['city']   . "\r\n";
-                            $body .= "province = " . $member_data['province']   . "\r\n";
-                            $body .= "postalcode = " . $member_data['postalcode']   . "\r\n";
-                            //$body .= "emailaddress = " . $member_data['emailaddress']   . "\r\n";
-                            $body .= "phonenumber = " . $member_data['phonenumber']   . "\r\n";
-                            $body .= "gender = " . $member_data['gender']   . "\r\n";
-                            $body .= "researchfocus = " . $member_data['researchfocus']   . "\r\n";
-                            //$body .= "photo = " . $member_data['photo']   . "\r\n";
-                            //$body .= "paymentreceipt = " . $member_data['paymentreceipt']   . "\r\n";
-                            $body .= "registration date = " . $member_data['membersince']   . "\r\n\r\n";
-                            $body .= "If you have any question, Please Contact Help Desk at = ". $options['membership_admin_email'] . "\r\n\r\n";
-                            //$headers = 'From: '.$options['short_tittle']. ' Membership Administrator <'. $options['membership_admin_email'] . '>';
+                            $body .= "name = " . esc_html($member_data['name']) . "\r\n";
+                            $body .= "institution = " . esc_html($member_data['institution'])  . "\r\n";
+                            $body .= "department = " . esc_html($member_data['department'])  . "\r\n";
+                            $body .= "address = " . esc_html($member_data['address'])  . "\r\n";
+                            $body .= "city = " . esc_html($member_data['city'])   . "\r\n";
+                            $body .= "province = " . esc_html($member_data['province'])   . "\r\n";
+                            $body .= "postalcode = " . esc_html($member_data['postalcode'])   . "\r\n";
+                            $body .= "phonenumber = " . esc_html($member_data['phonenumber'])   . "\r\n";
+                            $body .= "gender = " . esc_html($member_data['gender'])   . "\r\n";
+                            $body .= "researchfocus = " . esc_html($member_data['researchfocus'])   . "\r\n";
+                            $body .= "registration date = " . esc_html($member_data['membersince'])   . "\r\n\r\n";
+                            $body .= "If you have any question, Please Contact Help Desk at = ". sanitize_email($options['membership_admin_email']) . "\r\n\r\n";
                             wp_mail( $multiple_recipients, $subj, $body );
                         }
 
                     } else {
                         $output .= '<h3>FAILED.... Something Wrong!</h3>';
-                        $output .= '<h4>Please Try Again! Fill All Required Colunm! <br/>if error persist, contact membership help desk for assistance! ' . $options['membership_admin_email'] . '</h4>';
+                        $output .= '<h4>Please Try Again! Fill All Required Colunm! <br/>if error persist, contact membership help desk for assistance! ' . sanitize_email($options['membership_admin_email']) . '</h4>';
                     } 
             
 	} else {
         
             if( ($valid == false) && isset( $_POST['ammsname'] ) ) {
-                $output .= '<h4>' . $abortmessage . ' <br/>if error persist, contact membership help desk for assistance! ' . $options['membership_admin_email'] . '</h4>';
+                $output .= '<h4>' . esc_html($abortmessage) . ' <br/>if error persist, contact membership help desk for assistance! ' . sanitize_email($options['membership_admin_email']) . '</h4>';
             }
             
             // Include form from html file

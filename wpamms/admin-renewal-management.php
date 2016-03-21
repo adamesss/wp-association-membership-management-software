@@ -39,7 +39,6 @@ function wpamms_renewalmanagement_page() {
                     $renewal_query .= $wpdb->get_blog_prefix();
                     $renewal_query .= "amms_renewal WHERE confirmed = '-1' ORDER BY renewaldate ASC";
 
-                    //$renewals_data = $wpdb->get_results( $wpdb->prepare( $renewal_query ), ARRAY_A );
                     $renewals_data = $wpdb->get_results( $renewal_query , ARRAY_A );
             ?>
 
@@ -61,17 +60,17 @@ function wpamms_renewalmanagement_page() {
                                     echo '<td><input type="checkbox" name="renewals_id[]" value="';
                                         echo esc_attr( $renewal_data['id'] ) . '" /></td>';
                                     echo '<td><a href="' . add_query_arg( array( 'page' => 'wpamms-renewal', 'id' => $renewal_data['id'] ), admin_url( 'admin.php' ) );
-                                        echo '">' . $renewal_data['name'] . '</a></td>';
-                                    echo '<td>' . $renewal_data['emailaddress'] . ' </td>';
+                                        echo '">' . esc_html($renewal_data['name']) . '</a></td>';
+                                    echo '<td>' . sanitize_email($renewal_data['emailaddress']) . ' </td>';
                                       
                                     if( $renewal_data['paymentreceipt'] != '') {
                                         echo '<td><a onclick="ammspopup(';
-                                        echo "'". $renewal_data['paymentreceipt']."'";
+                                        echo "'". esc_url($renewal_data['paymentreceipt'])."'";
                                         echo ')">Proof of Payment</a> </td>';
                                     } else
                                         echo '<td></td>';
                                         
-                                    echo '<td>' . $renewal_data['renewaldate'] . '</td>';
+                                    echo '<td>' . esc_html($renewal_data['renewaldate']) . '</td>';
 
                                     if($renewal_data['confirmed'] == 1)
                                         echo '<td>true</td></tr>';
@@ -95,7 +94,6 @@ function wpamms_renewalmanagement_page() {
                     $renewal_query .= $wpdb->get_blog_prefix();
                     $renewal_query .= "amms_renewal  WHERE confirmed = '1' ORDER BY renewaldate DESC";
 
-                    //$renewals_data = $wpdb->get_results( $wpdb->prepare( $renewal_query ), ARRAY_A );
                     $renewals_data = $wpdb->get_results( $renewal_query , ARRAY_A );
             ?>
 
@@ -117,17 +115,17 @@ function wpamms_renewalmanagement_page() {
                                     echo '<td><input type="checkbox" name="renewals_id[]" value="';
                                         echo esc_attr( $renewal_data['id'] ) . '" /></td>';
                                     echo '<td><a href="' . add_query_arg( array( 'page' => 'wpamms-renewal', 'id' => $renewal_data['id'] ), admin_url( 'admin.php' ) );
-                                        echo '">' . $renewal_data['name'] . '</a></td>';
-                                    echo '<td>' . $renewal_data['emailaddress'] . ' </td>';
+                                        echo '">' . esc_html($renewal_data['name']) . '</a></td>';
+                                    echo '<td>' . sanitize_email($renewal_data['emailaddress']) . ' </td>';
                                       
                                     if( $renewal_data['paymentreceipt'] != '') {
                                         echo '<td><a onclick="ammspopup(';
-                                        echo "'". $renewal_data['paymentreceipt']."'";
+                                        echo "'". esc_url($renewal_data['paymentreceipt'])."'";
                                         echo ')">Proof of Payment</a> </td>';
                                     } else
                                         echo '<td></td>';
                                         
-                                    echo '<td>' . $renewal_data['renewaldate'] . '</td>';
+                                    echo '<td>' . esc_html($renewal_data['renewaldate']) . '</td>';
 
                                     if($renewal_data['confirmed'] == 1)
                                         echo '<td>true</td></tr>';
@@ -148,7 +146,6 @@ function wpamms_renewalmanagement_page() {
                     $renewal_query .= $wpdb->get_blog_prefix();
                     $renewal_query .= "amms_renewal WHERE confirmed = '0' ORDER BY renewaldate DESC";
 
-                    //$renewals_data = $wpdb->get_results( $wpdb->prepare( $renewal_query ), ARRAY_A );
                     $renewals_data = $wpdb->get_results( $renewal_query , ARRAY_A );
             ?>
 
@@ -170,17 +167,17 @@ function wpamms_renewalmanagement_page() {
                                     echo '<td><input type="checkbox" name="renewals_id[]" value="';
                                         echo esc_attr( $renewal_data['id'] ) . '" /></td>';
                                     echo '<td><a href="' . add_query_arg( array( 'page' => 'wpamms-renewal', 'id' => $renewal_data['id'] ), admin_url( 'admin.php' ) );
-                                        echo '">' . $renewal_data['name'] . '</a></td>';
-                                    echo '<td>' . $renewal_data['emailaddress'] . ' </td>';
+                                        echo '">' . esc_html($renewal_data['name']) . '</a></td>';
+                                    echo '<td>' . sanitize_email($renewal_data['emailaddress']) . ' </td>';
                                       
                                     if( $renewal_data['paymentreceipt'] != '') {
                                         echo '<td><a onclick="ammspopup(';
-                                        echo "'". $renewal_data['paymentreceipt']."'";
+                                        echo "'". esc_url($renewal_data['paymentreceipt'])."'";
                                         echo ')">Proof of Payment</a> </td>';
                                     } else
                                         echo '<td></td>';
                                         
-                                    echo '<td>' . $renewal_data['renewaldate'] . '</td>';
+                                    echo '<td>' . esc_html($renewal_data['renewaldate']) . '</td>';
 
                                     if($renewal_data['confirmed'] == 1)
                                         echo '<td>true</td></tr>';
@@ -202,16 +199,15 @@ function wpamms_renewalmanagement_page() {
 
 		// Display renewal creation and editing form if renewal is new
 		// or numeric id was sent       
-		$renewal_id = $_GET['id'];
+		$renewal_id = sanitize_text_field($_GET['id']);
 		$renewal_data = array();
 		$mode = 'new';
 
 		// Query database if numeric id is present
 		if ( is_numeric( $renewal_id ) ) {
 			$renewal_query = 'select * from ' . $wpdb->get_blog_prefix();
-			$renewal_query .= 'amms_renewal where id = ' . $renewal_id;
+			$renewal_query .= 'amms_renewal where id = ' . intval($renewal_id);
 
-			//$renewal_data = $wpdb->get_row( $wpdb->prepare( $renewal_query ), ARRAY_A );
 			$renewal_data = $wpdb->get_row( $renewal_query , ARRAY_A );
 
 			if ( $renewal_data ) $mode = 'edit';
@@ -228,8 +224,8 @@ function wpamms_renewalmanagement_page() {
 		if ( $mode == 'new' ) {
 			echo '<h3>Add New Renewal</h3>';
 		} elseif ( $mode == 'edit' ) {
-			echo '<h3>Edit Renewal #' . $renewal_data['id'] . ' - ';
-			echo $renewal_data['name'] . '</h3>';
+			echo '<h3>Edit Renewal #' . esc_html($renewal_data['id']) . ' - ';
+			echo esc_html($renewal_data['name']) . '</h3>';
 		}
 		?>
             

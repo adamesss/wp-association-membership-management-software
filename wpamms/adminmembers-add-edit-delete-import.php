@@ -31,24 +31,28 @@ function process_wpamms_member() {
 
 	// Place all user submitted values in an array
 	$member_data = array();
-	$member_data['id'] = ( isset( $_POST['id'] ) ? $_POST['id'] : '' );
-	$member_data['name'] = ( isset( $_POST['name'] ) ? $_POST['name'] : '' );
-	$member_data['memberid'] = ( isset( $_POST['memberid'] ) ? $_POST['memberid'] : '' );
-	$member_data['institution'] = ( isset( $_POST['institution'] ) ? $_POST['institution'] : '' );
-	$member_data['department'] = ( isset( $_POST['department'] ) ? $_POST['department'] : '' );
-	$member_data['address'] = ( isset( $_POST['address'] ) ? $_POST['address'] : '' );
-	$member_data['city'] = ( isset( $_POST['city'] ) ? $_POST['city'] : '' );
-	$member_data['province'] = ( isset( $_POST['province'] ) ? $_POST['province'] : '' );
-	$member_data['postalcode'] = ( isset( $_POST['postalcode'] ) ? $_POST['postalcode'] : '' );
-	$member_data['emailaddress'] = ( isset( $_POST['emailaddress'] ) ? $_POST['emailaddress'] : '' );
-	$member_data['phonenumber'] = ( isset( $_POST['phonenumber'] ) ? $_POST['phonenumber'] : '' );
-	$member_data['gender'] = ( isset( $_POST['gender'] ) ? $_POST['gender'] : '' );
-	$member_data['researchfocus'] = ( isset( $_POST['researchfocus'] ) ? $_POST['researchfocus'] : '' );
-	$member_data['photo'] = ( isset( $_POST['photo'] ) ? $_POST['photo'] : '' );
-	$member_data['paymentreceipt'] = ( isset( $_POST['paymentreceipt'] ) ? $_POST['paymentreceipt'] : '' );
-	$member_data['membersince'] = ( isset( $_POST['membersince'] ) ? $_POST['membersince'] : '' );
-	$member_data['expirationdate'] = ( isset( $_POST['expirationdate'] ) ? $_POST['expirationdate'] : '' );
-	$member_data['active'] = ( isset( $_POST['active'] ) ? $_POST['active'] : '' );
+	$member_data['id'] = ( isset( $_POST['id'] ) ? sanitize_text_field($_POST['id']) : '' );
+	$member_data['name'] = ( isset( $_POST['name'] ) ? sanitize_text_field($_POST['name']) : '' );
+	$member_data['memberid'] = ( isset( $_POST['memberid'] ) ? sanitize_text_field($_POST['memberid']) : '' );
+	$member_data['institution'] = ( isset( $_POST['institution'] ) ? sanitize_text_field($_POST['institution']) : '' );
+	$member_data['department'] = ( isset( $_POST['department'] ) ? sanitize_text_field($_POST['department']) : '' );
+	$member_data['address'] = ( isset( $_POST['address'] ) ? sanitize_text_field($_POST['address']) : '' );
+	$member_data['city'] = ( isset( $_POST['city'] ) ? sanitize_text_field($_POST['city']) : '' );
+	$member_data['province'] = ( isset( $_POST['province'] ) ? sanitize_text_field($_POST['province']) : '' );
+	$member_data['postalcode'] = ( isset( $_POST['postalcode'] ) ? sanitize_text_field($_POST['postalcode']) : '' );
+	$member_data['emailaddress'] = ( isset( $_POST['emailaddress'] ) ? sanitize_email($_POST['emailaddress']) : '' );
+        if(is_email($member_data['emailaddress']) == false)
+            $member_data['emailaddress'] = '';
+        else
+            $member_data['emailaddress'] = is_email($member_data['emailaddress']);
+	$member_data['phonenumber'] = ( isset( $_POST['phonenumber'] ) ? sanitize_text_field($_POST['phonenumber']) : '' );
+	$member_data['gender'] = ( isset( $_POST['gender'] ) ? sanitize_text_field($_POST['gender']) : '' );
+	$member_data['researchfocus'] = ( isset( $_POST['researchfocus'] ) ? sanitize_text_field($_POST['researchfocus']) : '' );
+	$member_data['photo'] = ( isset( $_POST['photo'] ) ? sanitize_text_field($_POST['photo']) : '' );
+	$member_data['paymentreceipt'] = ( isset( $_POST['paymentreceipt'] ) ? sanitize_text_field($_POST['paymentreceipt']) : '' );
+	$member_data['membersince'] = ( isset( $_POST['membersince'] ) ? sanitize_text_field($_POST['membersince']) : '' );
+	$member_data['expirationdate'] = ( isset( $_POST['expirationdate'] ) ? sanitize_text_field($_POST['expirationdate']) : '' );
+	$member_data['active'] = ( isset( $_POST['active'] ) ? sanitize_text_field($_POST['active']) : '' );
 	$member_data['notification1'] = '0';
 	$member_data['notification2'] = '0';
 	$member_data['notification3'] = '0';
@@ -96,42 +100,38 @@ function process_wpamms_member() {
                 $member_data['id'] = ''; 
 		$wpdb->insert($wpdb->get_blog_prefix() . 'amms_members', $member_data );
         } elseif ( isset( $_POST['id'] ) && is_numeric( $_POST['id'] ) ) {
-		$wpdb->update( $wpdb->get_blog_prefix() . 'amms_members', $member_data, array( 'id' => $_POST['id'] ) );
+		$wpdb->update( $wpdb->get_blog_prefix() . 'amms_members', $member_data, array( 'id' => intval($_POST['id']) ) );
         }
         
         if ($options['send_email_notification']) {
             $multiple_recipients = array(
-                $member_data['emailaddress'],
-                $options['membership_admin_email']
+                sanitize_email($member_data['emailaddress']),
+                sanitize_email($options['membership_admin_email'])
             );
-            $subj = "[Notification] ".$options['short_tittle']." Membership (id=".$member_data['memberid'].') has been updated';
+            $subj = "[Notification] ".esc_html($options['short_tittle'])." Membership (id=".esc_html($member_data['memberid']).') has been updated';
 
             $body = "Your Membership Registration Data :\r\n\r\n";
-            $body .= "name = " . $member_data['name'] . "\r\n\r\n";
-            $body .= "member id = " . $member_data['memberid'] . "\r\n\r\n";
-            $body .= "institution = " . $member_data['institution']  . "\r\n";
-            $body .= "department = " . $member_data['department']  . "\r\n";
-            $body .= "address = " . $member_data['address']  . "\r\n";
-            $body .= "city = " . $member_data['city']   . "\r\n";
-            $body .= "province = " . $member_data['province']   . "\r\n";
-            $body .= "postalcode = " . $member_data['postalcode']   . "\r\n";
-            //$body .= "emailaddress = " . $member_data['emailaddress']   . "\r\n";
-            $body .= "phonenumber = " . $member_data['phonenumber']   . "\r\n";
-            $body .= "gender = " . $member_data['gender']   . "\r\n";
-            $body .= "researchfocus = " . $member_data['researchfocus']   . "\r\n";
-            //$body .= "photo = " . $member_data['photo']   . "\r\n";
-            //$body .= "paymentreceipt = " . $member_data['paymentreceipt']   . "\r\n";
-            $body .= "registration date = " . $member_data['membersince']   . "\r\n";
-            $body .= "expiration date = " . $member_data['expirationdate']   . "\r\n";
+            $body .= "name = " . esc_html($member_data['name']) . "\r\n\r\n";
+            $body .= "member id = " . esc_html($member_data['memberid']) . "\r\n\r\n";
+            $body .= "institution = " . esc_html($member_data['institution'])  . "\r\n";
+            $body .= "department = " . esc_html($member_data['department'])  . "\r\n";
+            $body .= "address = " . esc_html($member_data['address'])  . "\r\n";
+            $body .= "city = " . esc_html($member_data['city'])   . "\r\n";
+            $body .= "province = " . esc_html($member_data['province'])   . "\r\n";
+            $body .= "postalcode = " . esc_html($member_data['postalcode'])   . "\r\n";
+            $body .= "phonenumber = " . esc_html($member_data['phonenumber'])   . "\r\n";
+            $body .= "gender = " . esc_html($member_data['gender'])   . "\r\n";
+            $body .= "researchfocus = " . esc_html($member_data['researchfocus'])   . "\r\n";
+            $body .= "registration date = " . esc_html($member_data['membersince'])   . "\r\n";
+            $body .= "expiration date = " . esc_html($member_data['expirationdate'])   . "\r\n";
 
             if($member_data['active'] == 1)
                 $body .= "membership status = ACTIVE \r\n\r\n ";
             else 
                 $body .= "membership status = EXPIRED \r\n\r\n ";
 
-            $body .= "In Case Any Incorrect Data, Please Report to Membership Help Desk at = ". $options['membership_admin_email'] . "\r\n\r\n";
+            $body .= "In Case Any Incorrect Data, Please Report to Membership Help Desk at = ". sanitize_email($options['membership_admin_email']) . "\r\n\r\n";
             $body .= "Your Membership Card Is Available To Be Downloaded at Our Membership Website \r\n\r\n";
-            //$headers = 'From: '.$options['short_tittle']. ' Membership Administrator <'. $options['membership_admin_email'] . '>';
             wp_mail( $multiple_recipients, $subj, $body );     
         }
         
@@ -157,8 +157,7 @@ function delete_amms_member() {
 
 		foreach ( $members_to_delete as $member_to_delete ) {
 			$query = 'DELETE from ' . $wpdb->get_blog_prefix() . 'amms_members ';
-			$query .= 'WHERE id = ' . intval( $member_to_delete );
-			//$wpdb->query( $wpdb->prepare( $query ) );
+			$query .= 'WHERE id = ' . intval( sanitize_text_field($member_to_delete) );
 			$wpdb->query( $query );
 		}
 	}
@@ -193,23 +192,23 @@ function import_wpamms_members() {
 				if ( count( $data ) == 17 && $row != 1 ) {
 					$new_member = array( 
                                                         'id' => '',
-                                                        'name' => $data[0],
-                                                        'memberid' => $data[1],
-                                                        'institution' => $data[2],
-                                                        'department' => $data[3],
-                                                        'address' => $data[4],
-                                                        'city' => $data[5],
-                                                        'province' => $data[6],
-                                                        'postalcode' => $data[7],
-                                                        'emailaddress' => $data[8],
-                                                        'phonenumber' => $data[9],
-                                                        'gender' => $data[10],
-                                                        'researchfocus' => $data[11],
-                                                        'photo' => $data[12],
-                                                        'paymentreceipt' => $data[13],
-                                                        'membersince' => $data[14],
-                                                        'expirationdate' => $data[15],
-                                                        'active' => $data[16],
+                                                        'name' => sanitize_text_field($data[0]),
+                                                        'memberid' => sanitize_text_field($data[1]),
+                                                        'institution' => sanitize_text_field($data[2]),
+                                                        'department' => sanitize_text_field($data[3]),
+                                                        'address' => sanitize_text_field($data[4]),
+                                                        'city' => sanitize_text_field($data[5]),
+                                                        'province' => sanitize_text_field($data[6]),
+                                                        'postalcode' => sanitize_text_field($data[7]),
+                                                        'emailaddress' => sanitize_email($data[8]),
+                                                        'phonenumber' => sanitize_text_field($data[9]),
+                                                        'gender' => sanitize_text_field($data[10]),
+                                                        'researchfocus' => sanitize_text_field($data[11]),
+                                                        'photo' => sanitize_text_field($data[12]),
+                                                        'paymentreceipt' => sanitize_text_field($data[13]),
+                                                        'membersince' => sanitize_text_field($data[14]),
+                                                        'expirationdate' => sanitize_text_field($data[15]),
+                                                        'active' => sanitize_text_field($data[16]),
                                                         'notification1' => '0',
                                                         'notification2' => '0',
                                                         'notification3' => '0' );

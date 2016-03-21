@@ -28,12 +28,16 @@ function process_wpamms_renewal() {
 
 	// Place all user submitted values in an array
 	$member_data = array();
-	$member_data['id'] = ( isset( $_POST['id'] ) ? $_POST['id'] : '' );
-	$member_data['name'] = ( isset( $_POST['name'] ) ? $_POST['name'] : '' );
-	$member_data['emailaddress'] = ( isset( $_POST['emailaddress'] ) ? $_POST['emailaddress'] : '' );
-	$member_data['paymentreceipt'] = ( isset( $_POST['paymentreceipt'] ) ? $_POST['paymentreceipt'] : '' );
-	$member_data['renewaldate'] = ( isset( $_POST['renewaldate'] ) ? $_POST['renewaldate'] : '' );
-	$member_data['confirmed'] = ( isset( $_POST['confirmed'] ) ? $_POST['confirmed'] : '' );
+	$member_data['id'] = ( isset( $_POST['id'] ) ? sanitize_text_field($_POST['id']) : '' );
+	$member_data['name'] = ( isset( $_POST['name'] ) ? sanitize_text_field($_POST['name']) : '' );
+	$member_data['emailaddress'] = ( isset( $_POST['emailaddress'] ) ? sanitize_email($_POST['emailaddress']) : '' );
+        if(is_email($member_data['emailaddress']) == false)
+            $member_data['emailaddress'] = '';
+        else
+            $member_data['emailaddress'] = is_email($member_data['emailaddress']);
+	$member_data['paymentreceipt'] = ( isset( $_POST['paymentreceipt'] ) ? sanitize_text_field($_POST['paymentreceipt']) : '' );
+	$member_data['renewaldate'] = ( isset( $_POST['renewaldate'] ) ? sanitize_text_field($_POST['renewaldate']) : '' );
+	$member_data['confirmed'] = ( isset( $_POST['confirmed'] ) ? sanitize_text_field($_POST['confirmed']) : '' );
             
         if ( ! function_exists( 'wp_handle_upload' ) ) {
             require_once( ABSPATH . 'wp-admin/includes/file.php' );
@@ -62,29 +66,26 @@ function process_wpamms_renewal() {
                 $member_data['id'] = ''; 
 		$wpdb->insert($wpdb->get_blog_prefix() . 'amms_renewal', $member_data );
         } elseif ( isset( $_POST['id'] ) && is_numeric( $_POST['id'] ) ) {
-		$wpdb->update( $wpdb->get_blog_prefix() . 'amms_renewal', $member_data, array( 'id' => $_POST['id'] ) );
+		$wpdb->update( $wpdb->get_blog_prefix() . 'amms_renewal', $member_data, array( 'id' => intval($_POST['id']) ) );
         }
         
         if ($options['send_email_notification']) {
             $multiple_recipients = array(
-                $member_data['emailaddress'],
-                $options['membership_admin_email']
+                sanitize_email($member_data['emailaddress']),
+                sanitize_email($options['membership_admin_email'])
             );
-            $subj = "[Notification]  Your Renewal at ".$options['short_tittle']." Membership (id=".$member_data['memberid'].') has been updated';
+            $subj = "[Notification]  Your Renewal at ".esc_html($options['short_tittle'])." Membership (id=".esc_html($member_data['memberid']).') has been updated';
 
             $body = "Your Membership Renewal Data : \r\n\r\n";
-            $body .= "name = " . $member_data['name'] . "\r\n";
-            //$body .= "emailaddress = " . $member_data['emailaddress']   . "\r\n";
-            //$body .= "paymentreceipt = " . $member_data['paymentreceipt']   . "\r\n";
-            $body .= "renewal date = " . $member_data['renewaldate']   . "\r\n";
+            $body .= "name = " . esc_html($member_data['name']) . "\r\n";
+            $body .= "renewal date = " . esc_html($member_data['renewaldate'])   . "\r\n";
 
             if($member_data['confirmed'] == 1)
                 $body .= "renewal status = CONFIRMED \r\n\r\n ";
             else 
                 $body .= "renewal status = FAILED / REJECTED \r\n\r\n ";
 
-            $body .= "In Case Any Incorrect Data, Please Report to Membership Help Desk at = ". $options['membership_admin_email'] . "\r\n\r\n";
-            //$headers = 'From: '.$options['short_tittle']. ' Membership Administrator <'. $options['membership_admin_email'] . '>';
+            $body .= "In Case Any Incorrect Data, Please Report to Membership Help Desk at = ". sanitize_email($options['membership_admin_email']) . "\r\n\r\n";
             wp_mail( $multiple_recipients, $subj, $body ); 
         }
         
@@ -111,8 +112,7 @@ function delete_amms_renewal() {
 
 		foreach ( $renewals_to_delete as $renewal_to_delete ) {
 			$query = 'DELETE from ' . $wpdb->get_blog_prefix() . 'amms_renewal ';
-			$query .= 'WHERE id = ' . intval( $renewal_to_delete );
-			//$wpdb->query( $wpdb->prepare( $query ) );
+			$query .= 'WHERE id = ' . intval( sanitize_text_field($renewal_to_delete) );
 			$wpdb->query( $query );
 		}
 	}

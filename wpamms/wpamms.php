@@ -61,7 +61,6 @@ function do_this_daily() {
         $member_query .= $wpdb->get_blog_prefix();
         $member_query .= "amms_members WHERE DATEDIFF(`expirationdate`, CURDATE()) IN (60,59,58,57,56,55,54,30,29,28,27,26,25,24,0,-1,-2,-3,-4,-5,-6)";
 
-        //$members_data = $wpdb->get_results( $wpdb->prepare( $member_query ), ARRAY_A );
         $members_data = $wpdb->get_results( $member_query , ARRAY_A );
         
         // Check if any members were found
@@ -81,19 +80,19 @@ function do_this_daily() {
                       
                     if ($options['send_email_notification']) { 
                         $multiple_recipients = array(
-                            $member_data['emailaddress'],
-                            $options['membership_admin_email']
+                            sanitize_email($member_data['emailaddress']),
+                            sanitize_email($options['membership_admin_email'])
                         );
 
                         if ($member_data['activeduration'] <= 0) {
-                            $subj = "[Expired] ".$options['short_tittle']." Membership (id=".$member_data['memberid'].') has been expired. Renew Now';
+                            $subj = "[Expired] ".esc_html($options['short_tittle'])." Membership (id=".esc_html($member_data['memberid']).') has been expired. Renew Now';
                         } else {
-                            $subj = "[Reminder] ".$options['short_tittle']." Membership (id=".$member_data['memberid'].') is almost expired. Renew Now';
+                            $subj = "[Reminder] ".esc_html($options['short_tittle'])." Membership (id=".esc_html($member_data['memberid']).') is almost expired. Renew Now';
                         }
 
-                        $body = "Dear " . $member_data['name'] . "\r\n";
-                        $body .= $member_data['institution']  . "\r\n";
-                        $body .= $member_data['department']  . "\r\n\r\n";
+                        $body = "Dear " . esc_html($member_data['name']) . "\r\n";
+                        $body .= esc_html($member_data['institution'])  . "\r\n";
+                        $body .= esc_html($member_data['department'])  . "\r\n\r\n";
 
                         if ($member_data['activeduration'] >= 0) {
                             $body .= "Your memberships will remain active for the next ".$member_data['activeduration']." days \r\n";
@@ -101,20 +100,20 @@ function do_this_daily() {
                             $body .= "Your memberships had been expired \r\n";
                         }
                         
-                        $body .= "Expiration date = " . $member_data['expirationdate']   . "\r\n\r\n";
+                        $body .= "Expiration date = " . esc_html($member_data['expirationdate'])   . "\r\n\r\n";
                         $body .= "Renew now please. \r\n\r\n";
-                        $body .= "If you have any question, Please Contact Help Desk at = ". $options['membership_admin_email'] . "\r\n\r\n";
+                        $body .= "If you have any question, Please Contact Help Desk at = ". sanitize_email($options['membership_admin_email']) . "\r\n\r\n";
 
                         if ( wp_mail( $multiple_recipients, $subj, $body ) ) {
                             
                             if( $member_data['activeduration'] >= 54  ) {
-                                $cronquery = "UPDATE " . $wpdb->get_blog_prefix() . "amms_members SET notification1 = '1' WHERE id = '".$member_data['id']."' " ;
+                                $cronquery = "UPDATE " . $wpdb->get_blog_prefix() . "amms_members SET notification1 = '1' WHERE id = '".intval($member_data['id'])."' " ;
                                 $wpdb->query( $cronquery );
                             } elseif( $member_data['activeduration'] >= 24 ) {
-                                $cronquery = "UPDATE " . $wpdb->get_blog_prefix() . "amms_members SET notification2 = '1' WHERE id = '".$member_data['id']."' " ;
+                                $cronquery = "UPDATE " . $wpdb->get_blog_prefix() . "amms_members SET notification2 = '1' WHERE id = '".intval($member_data['id'])."' " ;
                                 $wpdb->query( $cronquery );
                             } elseif( $member_data['activeduration'] >= -6 ) {
-                                $cronquery = "UPDATE " . $wpdb->get_blog_prefix() . "amms_members SET notification3 = '1' WHERE id = '".$member_data['id']."' " ;
+                                $cronquery = "UPDATE " . $wpdb->get_blog_prefix() . "amms_members SET notification3 = '1' WHERE id = '".intval($member_data['id'])."' " ;
                                 $wpdb->query( $cronquery );
                             }
                       

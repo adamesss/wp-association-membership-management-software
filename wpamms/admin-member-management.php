@@ -39,7 +39,6 @@ function wpamms_membermanagement_page() {
                     $member_query .= $wpdb->get_blog_prefix();
                     $member_query .= "amms_members WHERE active = '-1' ORDER BY membersince ASC";
 
-                    //$members_data = $wpdb->get_results( $wpdb->prepare( $member_query ), ARRAY_A );
                     $members_data = $wpdb->get_results( $member_query , ARRAY_A );
             ?>
 
@@ -62,35 +61,35 @@ function wpamms_membermanagement_page() {
                                     echo '<td><input type="checkbox" name="members_id[]" value="';
                                         echo esc_attr( $member_data['id'] ) . '" /></td>';
                                     echo '<td><a href="' . add_query_arg( array( 'page' => 'wpamms-members', 'id' => $member_data['id'] ), admin_url( 'admin.php' ) );
-                                        echo '">' . $member_data['name'] . '</a></td>';
-                                    echo '<td>' . $member_data['memberid'] . ' | ' 
-                                                . $member_data['institution'] . ' | ' 
-                                                . $member_data['department'] . ' | ' 
-                                                . $member_data['address'] . ' | ' 
-                                                . $member_data['city'] . ' | ' 
-                                                . $member_data['province'] . ' | ' 
-                                                . $member_data['postalcode'] . ' | ' 
-                                                . $member_data['emailaddress'] . ' | ' 
-                                                . $member_data['phonenumber'] . ' | ' 
-                                                . $member_data['gender'] . ' | ' 
-                                                . $member_data['researchfocus'] . ' </td>';
+                                        echo '">' . esc_html($member_data['name']) . '</a></td>';
+                                    echo '<td>' . esc_html($member_data['memberid']) . ' | ' 
+                                                . esc_html($member_data['institution']) . ' | ' 
+                                                . esc_html($member_data['department']) . ' | ' 
+                                                . esc_html($member_data['address']) . ' | ' 
+                                                . esc_html($member_data['city']) . ' | ' 
+                                                . esc_html($member_data['province']) . ' | ' 
+                                                . esc_html($member_data['postalcode']) . ' | ' 
+                                                . sanitize_email($member_data['emailaddress']) . ' | ' 
+                                                . esc_html($member_data['phonenumber']) . ' | ' 
+                                                . esc_html($member_data['gender']) . ' | ' 
+                                                . esc_html($member_data['researchfocus']) . ' </td>';
 
                                     if( $member_data['photo'] != '') {
                                         echo '<td><a onclick="ammspopup(';
-                                        echo "'". $member_data['photo']."'";
+                                        echo "'". esc_url($member_data['photo'])."'";
                                         echo ')">Photo</a> | ';
                                     } else 
                                         echo '<td>';
                                       
                                     if( $member_data['paymentreceipt'] != '') {
                                         echo '<a onclick="ammspopup(';
-                                        echo "'". $member_data['paymentreceipt']."'";
+                                        echo "'". esc_url($member_data['paymentreceipt'])."'";
                                         echo ')">Proof of Payment</a> </td>';
                                     } else
                                         echo '</td>';
                                         
-                                    echo '<td>' . $member_data['membersince'] . '</td>';
-                                    echo '<td>' . $member_data['expirationdate'] . '</td>';
+                                    echo '<td>' . esc_html($member_data['membersince']) . '</td>';
+                                    echo '<td>' . esc_html($member_data['expirationdate']) . '</td>';
 
                                     if($member_data['active'] == 1)
                                         echo '<td>true</td></tr>';
@@ -115,7 +114,6 @@ function wpamms_membermanagement_page() {
                     $member_query .= $wpdb->get_blog_prefix();
                     $member_query .= "amms_members WHERE active = '1' ORDER BY DATEDIFF(`expirationdate`, CURDATE() ) ASC";
 
-                    //$members_data = $wpdb->get_results( $wpdb->prepare( $member_query ), ARRAY_A );
                     $members_data = $wpdb->get_results( $member_query , ARRAY_A );
             ?>
 
@@ -138,35 +136,35 @@ function wpamms_membermanagement_page() {
                                     echo '<td><input type="checkbox" name="members_id[]" value="';
                                         echo esc_attr( $member_data['id'] ) . '" /></td>';
                                     echo '<td><a href="' . add_query_arg( array( 'page' => 'wpamms-members', 'id' => $member_data['id'] ), admin_url( 'admin.php' ) );
-                                        echo '">' . $member_data['name'] . '</a></td>';
-                                    echo '<td>' . $member_data['memberid'] . ' | ' 
-                                                . $member_data['institution'] . ' | ' 
-                                                . $member_data['department'] . ' | ' 
-                                                . $member_data['address'] . ' | ' 
-                                                . $member_data['city'] . ' | ' 
-                                                . $member_data['province'] . ' | ' 
-                                                . $member_data['postalcode'] . ' | ' 
-                                                . $member_data['emailaddress'] . ' | ' 
-                                                . $member_data['phonenumber'] . ' | ' 
-                                                . $member_data['gender'] . ' | ' 
-                                                . $member_data['researchfocus'] . ' </td>';
+                                        echo '">' . esc_html($member_data['name']) . '</a></td>';
+                                    echo '<td>' . esc_html($member_data['memberid']) . ' | ' 
+                                                . esc_html($member_data['institution']) . ' | ' 
+                                                . esc_html($member_data['department']) . ' | ' 
+                                                . esc_html($member_data['address']) . ' | ' 
+                                                . esc_html($member_data['city']) . ' | ' 
+                                                . esc_html($member_data['province']) . ' | ' 
+                                                . esc_html($member_data['postalcode']) . ' | ' 
+                                                . sanitize_email($member_data['emailaddress']) . ' | ' 
+                                                . esc_html($member_data['phonenumber']) . ' | ' 
+                                                . esc_html($member_data['gender']) . ' | ' 
+                                                . esc_html($member_data['researchfocus']) . ' </td>';
 
                                     if( $member_data['photo'] != '') {
                                         echo '<td><a onclick="ammspopup(';
-                                        echo "'". $member_data['photo']."'";
+                                        echo "'". esc_url($member_data['photo'])."'";
                                         echo ')">Photo</a> | ';
                                     } else 
                                         echo '<td>';
                                       
                                     if( $member_data['paymentreceipt'] != '') {
                                         echo '<a onclick="ammspopup(';
-                                        echo "'". $member_data['paymentreceipt']."'";
+                                        echo "'". esc_url($member_data['paymentreceipt'])."'";
                                         echo ')">Proof of Payment</a> </td>';
                                     } else
                                         echo '</td>';
                                         
-                                    echo '<td>' . $member_data['membersince'] . '</td>';
-                                    echo '<td>' . $member_data['expirationdate'] . '</td>';
+                                    echo '<td>' . esc_html($member_data['membersince']) . '</td>';
+                                    echo '<td>' . esc_html($member_data['expirationdate']) . '</td>';
 
                                     if($member_data['active'] == 1)
                                         echo '<td>true</td></tr>';
@@ -188,7 +186,6 @@ function wpamms_membermanagement_page() {
                     $member_query .= $wpdb->get_blog_prefix();
                     $member_query .= "amms_members WHERE active = '0' ORDER BY DATEDIFF(`expirationdate`, CURDATE() ) DESC";
 
-                    //$members_data = $wpdb->get_results( $wpdb->prepare( $member_query ), ARRAY_A );
                     $members_data = $wpdb->get_results( $member_query , ARRAY_A );
             ?>
 
@@ -211,35 +208,35 @@ function wpamms_membermanagement_page() {
                                     echo '<td><input type="checkbox" name="members_id[]" value="';
                                         echo esc_attr( $member_data['id'] ) . '" /></td>';
                                     echo '<td><a href="' . add_query_arg( array( 'page' => 'wpamms-members', 'id' => $member_data['id'] ), admin_url( 'admin.php' ) );
-                                        echo '">' . $member_data['name'] . '</a></td>';
-                                    echo '<td>' . $member_data['memberid'] . ' | ' 
-                                                . $member_data['institution'] . ' | ' 
-                                                . $member_data['department'] . ' | ' 
-                                                . $member_data['address'] . ' | ' 
-                                                . $member_data['city'] . ' | ' 
-                                                . $member_data['province'] . ' | ' 
-                                                . $member_data['postalcode'] . ' | ' 
-                                                . $member_data['emailaddress'] . ' | ' 
-                                                . $member_data['phonenumber'] . ' | ' 
-                                                . $member_data['gender'] . ' | ' 
-                                                . $member_data['researchfocus'] . ' </td>';
+                                        echo '">' . esc_html($member_data['name']) . '</a></td>';
+                                    echo '<td>' . esc_html($member_data['memberid']) . ' | ' 
+                                                . esc_html($member_data['institution']) . ' | ' 
+                                                . esc_html($member_data['department']) . ' | ' 
+                                                . esc_html($member_data['address']) . ' | ' 
+                                                . esc_html($member_data['city']) . ' | ' 
+                                                . esc_html($member_data['province']) . ' | ' 
+                                                . esc_html($member_data['postalcode']) . ' | ' 
+                                                . sanitize_email($member_data['emailaddress']) . ' | ' 
+                                                . esc_html($member_data['phonenumber']) . ' | ' 
+                                                . esc_html($member_data['gender']) . ' | ' 
+                                                . esc_html($member_data['researchfocus']) . ' </td>';
 
                                     if( $member_data['photo'] != '') {
                                         echo '<td><a onclick="ammspopup(';
-                                        echo "'". $member_data['photo']."'";
+                                        echo "'". esc_url($member_data['photo'])."'";
                                         echo ')">Photo</a> | ';
                                     } else 
                                         echo '<td>';
                                       
                                     if( $member_data['paymentreceipt'] != '') {
                                         echo '<a onclick="ammspopup(';
-                                        echo "'". $member_data['paymentreceipt']."'";
+                                        echo "'". esc_url($member_data['paymentreceipt'])."'";
                                         echo ')">Proof of Payment</a> </td>';
                                     } else
                                         echo '</td>';
 
-                                    echo '<td>' . $member_data['membersince'] . '</td>';
-                                    echo '<td>' . $member_data['expirationdate'] . '</td>';
+                                    echo '<td>' . esc_html($member_data['membersince']) . '</td>';
+                                    echo '<td>' . esc_html($member_data['expirationdate']) . '</td>';
 
                                     if($member_data['active'] == 1)
                                         echo '<td>true</td></tr>';
@@ -282,16 +279,15 @@ function wpamms_membermanagement_page() {
 
 		// Display member creation and editing form if member is new
 		// or numeric id was sen       
-		$member_id = $_GET['id'];
+		$member_id = sanitize_text_field($_GET['id']);
 		$member_data = array();
 		$mode = 'new';
 
 		// Query database if numeric id is present
 		if ( is_numeric( $member_id ) ) {
 			$member_query = 'select * from ' . $wpdb->get_blog_prefix();
-			$member_query .= 'amms_members where id = ' . $member_id;
+			$member_query .= 'amms_members where id = ' . intval($member_id);
 
-			//$member_data = $wpdb->get_row( $wpdb->prepare( $member_query ), ARRAY_A );
 			$member_data = $wpdb->get_row( $member_query , ARRAY_A );
 
 			if ( $member_data ) $mode = 'edit';
@@ -320,8 +316,8 @@ function wpamms_membermanagement_page() {
 		if ( $mode == 'new' ) {
 			echo '<h3>Add New Member</h3>';
 		} elseif ( $mode == 'edit' ) {
-			echo '<h3>Edit Member #' . $member_data['id'] . ' - ';
-			echo $member_data['name'] . '</h3>';
+			echo '<h3>Edit Member #' . esc_html($member_data['id']) . ' - ';
+			echo esc_html($member_data['name']) . '</h3>';
 		}
 		?>
 

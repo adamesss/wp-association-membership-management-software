@@ -12,7 +12,8 @@ function wpamms_shortcode_renewal() {
 
         $valid = false;
         if( isset( $_POST['ammp_renewal_captcha'] ) ) {
-
+            $_POST['ammp_renewal_captcha'] = sanitize_text_field($_POST['ammp_renewal_captcha']) ;
+            
             // Variable used to determine if submission is valid
             // Check if captcha text was entered
                     if (empty($_POST['ammp_renewal_captcha'])) {
@@ -62,9 +63,13 @@ function wpamms_shortcode_renewal() {
                     // Place all user submitted values in an array
                     $member_data = array();         
                     $member_data['id'] = '';
-                    $member_data['name'] = $_POST['ammsname'] ;
-                    $member_data['emailaddress'] = $_POST['emailaddress'] ;
-                    $member_data['paymentreceipt'] = $_POST['paymentreceipt'] ;
+                    $member_data['name'] = sanitize_text_field($_POST['ammsname']) ;
+                    $member_data['emailaddress'] = sanitize_email($_POST['emailaddress']) ;
+                    if(is_email($member_data['emailaddress']) == false)
+                        $member_data['emailaddress'] = '';
+                    else
+                        $member_data['emailaddress'] = is_email($member_data['emailaddress']);
+                    $member_data['paymentreceipt'] = sanitize_text_field($_POST['paymentreceipt']) ;
                     $member_data['renewaldate'] = date("Y-m-d") ;
                     $member_data['confirmed'] = '-1';
 
@@ -83,7 +88,7 @@ function wpamms_shortcode_renewal() {
                             //var_dump( $movefile);
                             $member_data['paymentreceipt'] = $movefile['url'];
                         } else {
-                            wp_die('Upload PAYMENT RECEIPT Failed! if error persist, contact membership help desk for assistance! ' . $options['membership_admin_email'] );
+                            wp_die('Upload PAYMENT RECEIPT Failed! if error persist, contact membership help desk for assistance! ' . sanitize_email($options['membership_admin_email']) );
                         }
 
                     }
@@ -96,33 +101,30 @@ function wpamms_shortcode_renewal() {
                     if($wpdb->insert_id != false && $wpdb->insert_id >= 1) {
                         $output .= '<h3>SUCCESS.... The RENEWAL Form Had Been Submitted.</h3>';
                         $output .= '<h4>Please Wait 2 x 24 hours (work days) for Admin Verification Process</h4>';
-                        $output .= 'In Case Any Problem Occurs, Please Contact Membership Help Desk at = '. $options['membership_admin_email'];
+                        $output .= 'In Case Any Problem Occurs, Please Contact Membership Help Desk at = '. sanitize_email($options['membership_admin_email']);
 
                         if ($options['send_email_notification']) {
                             $multiple_recipients = array(
-                                $options['membership_admin_email'],
-                                $member_data['emailaddress']
+                                sanitize_email($options['membership_admin_email']),
+                                sanitize_email($member_data['emailaddress'])
                             );
-                            $subj = "[RENEWAL] ".$options['short_tittle']." Membership Needs Admin Verification Process";
+                            $subj = "[RENEWAL] ".esc_html($options['short_tittle'])." Membership Needs Admin Verification Process";
                             $body = "Membership RENEWAL Form \r\n";
-                            $body .= "name = " . $member_data['name'] . "\r\n";
-                            //$body .= "emailaddress = " . $member_data['emailaddress']   . "\r\n";
-                            //$body .= "paymentreceipt = " . $member_data['paymentreceipt']   . "\r\n";
-                            $body .= "renewal date = " . $member_data['renewaldate']   . "\r\n\r\n";
-                            $body .= "If you have any question, Please Contact Help Desk at = ". $options['membership_admin_email'] . "\r\n\r\n";
-                            //$headers = "From: ".$options['short_tittle']. " Membership Administrator <". $options['membership_admin_email'] . ">";
+                            $body .= "name = " . esc_html($member_data['name']) . "\r\n";
+                            $body .= "renewal date = " . esc_html($member_data['renewaldate'])   . "\r\n\r\n";
+                            $body .= "If you have any question, Please Contact Help Desk at = ". sanitize_email($options['membership_admin_email']) . "\r\n\r\n";
                             wp_mail( $multiple_recipients, $subj, $body );
                         }
 
                     } else {
                         $output .= '<h3>FAILED.... Something Wrong!</h3>';
-                        $output .= '<h4>Please Try Again! Fill All Required Colunm! <br/>if error persist, contact membership help desk for assistance! ' . $options['membership_admin_email'] . '</h4>';
+                        $output .= '<h4>Please Try Again! Fill All Required Colunm! <br/>if error persist, contact membership help desk for assistance! ' . sanitize_email($options['membership_admin_email']) . '</h4>';
                     } 
             
 	} else {
         
             if( ($valid == false) && isset( $_POST['ammsname'] ) ) {
-                $output .= '<h4>' . $abortmessage . ' <br/>if error persist, contact membership help desk for assistance! ' . $options['membership_admin_email'] . '</h4>';
+                $output .= '<h4>' . esc_html($abortmessage) . ' <br/>if error persist, contact membership help desk for assistance! ' . sanitize_email($options['membership_admin_email']) . '</h4>';
             }
             
             // Include form from html file

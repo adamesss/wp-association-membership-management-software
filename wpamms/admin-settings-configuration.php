@@ -55,7 +55,7 @@ function wpamms_display_text_field( $data = array() ) {
 	extract( $data );
 	$options = get_option( 'wpamms_options' ); 
 	?>
-        <input type="text" size="100" name="wpamms_options[<?php echo $name; ?>]" value="<?php echo esc_html( $options[$name] ); ?>"/><br />
+        <input type="text" size="100" name="wpamms_options[<?php echo esc_attr($name); ?>]" value="<?php echo esc_html( $options[$name] ); ?>"/><br />
 
 <?php }
 
@@ -64,7 +64,7 @@ function wpamms_display_text_field_disabled( $data = array() ) {
 	extract( $data );
 	$options = get_option( 'wpamms_options' ); 
 	?>
-        <input type="text" size="100" name="wpamms_options[<?php echo $name; ?>]" value="<?php echo esc_html( $options[$name] ); ?>" /><br />
+        <input type="text" size="100" name="wpamms_options[<?php echo esc_attr($name); ?>]" value="<?php echo esc_html( $options[$name] ); ?>" /><br />
         <b>Warning: don't change this value, unless you know what you are doing!<br/>
             You may change/edit the template for membercard (png image file), which is stored at "assets/membercard-template.png"</b><br/>
         In addition, you may need to modify some source code at 'shortcode-membercard.php' to define your own layout for your custom membercard<br/><br/>
@@ -76,7 +76,7 @@ function wpamms_display_check_box( $data = array() ) {
 	extract ( $data );
 	$options = get_option( 'wpamms_options' ); 
 	?>
-	<input type="checkbox" name="wpamms_options[<?php echo $name; ?>]" <?php if ( $options[$name] ) echo ' checked="checked" '; ?>/>
+	<input type="checkbox" name="wpamms_options[<?php echo esc_attr($name); ?>]" <?php if ( $options[$name] ) echo ' checked="checked" '; ?>/>
 <?php }
 
 // Register action hook to be called when the administration menu is

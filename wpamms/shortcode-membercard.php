@@ -12,7 +12,7 @@ function wpamms_shortcode_membercard() {
 
 	// Check if search string is in address
 	if ( !empty( $_POST['searchbt'] ) ) {
-		$search_string = str_replace("%40","@",$_POST['searchbt']);                 
+		$search_string = str_replace("%40","@",sanitize_text_field($_POST['searchbt']));                 
 		$search_mode = true;
 	} else {
 		$search_string = 'Enter your email address...';
@@ -43,7 +43,8 @@ function wpamms_shortcode_membercard() {
         
         $valid = false;
         if( isset( $_POST['ammp_renewal_captcha'] ) ) {
-
+            $_POST['ammp_renewal_captcha'] = sanitize_text_field($_POST['ammp_renewal_captcha']);
+            
             // Variable used to determine if submission is valid
             // Check if captcha text was entered
                     if (empty($_POST['ammp_renewal_captcha'])) {
@@ -95,7 +96,7 @@ function wpamms_shortcode_membercard() {
                 $members_data = $wpdb->get_results( $wpdb->prepare( $member_query, $search_term ), ARRAY_A );
 
 	} elseif ( $search_mode && !$valid) {
-            $output .= '<h5>'.$abortmessage.'</h3>';
+            $output .= '<h5>'.esc_html($abortmessage).'</h3>';
             $search_term = '';
         } else {
             $search_term = '';
@@ -120,7 +121,7 @@ function wpamms_shortcode_membercard() {
                     imagesavealpha($dest, true);                    
                     list($width, $height) = getimagesize($image_id_png);
                                     
-                    $member_data['photo'] = str_replace(" ", "%20", $member_data['photo']) ;
+                    $member_data['photo'] = esc_url(str_replace(" ", "%20", $member_data['photo'])) ;
 
                     if ($member_data['photo'] != '' && file_get_contents($member_data['photo']) != false) {    
                         $data = file_get_contents($member_data['photo']);
@@ -147,19 +148,19 @@ function wpamms_shortcode_membercard() {
 
                     imagealphablending($dest, true); //bring back alpha blending for transperent font
 
-                    imagettftext($dest, intval( $height * 0.04 ), 0, intval( $width * 0.05 ), intval( $height * 0.39 ), $membercard_white, $font, 'Member ID: '. $member_data['memberid']); 
-                    imagettftext($dest, intval( $height * 0.06 ), 0, intval( $width * 0.05 ), intval( $height * 0.53 ), $membercard_white, $font, $member_data['name']); 
-                    imagettftext($dest, intval( $height * 0.04 ), 0, intval( $width * 0.05 ), intval( $height * 0.64 ), $membercard_white, $font, $member_data['emailaddress']); 
-                    imagettftext($dest, intval( $height * 0.03 ), 0, intval( $width * 0.05 ), intval( $height * 0.73 ), $membercard_white, $font, 'Member Since: '. $member_data['membersince']); 
-                    imagettftext($dest, intval( $height * 0.025 ), 0, intval( $width * 0.05 ), intval( $height * 0.78 ), $membercard_white, $font, 'Valid Until: '. $member_data['expirationdate']); 
+                    imagettftext($dest, intval( $height * 0.04 ), 0, intval( $width * 0.05 ), intval( $height * 0.39 ), $membercard_white, $font, 'Member ID: '. esc_html($member_data['memberid'])); 
+                    imagettftext($dest, intval( $height * 0.06 ), 0, intval( $width * 0.05 ), intval( $height * 0.53 ), $membercard_white, $font, esc_html($member_data['name'])); 
+                    imagettftext($dest, intval( $height * 0.04 ), 0, intval( $width * 0.05 ), intval( $height * 0.64 ), $membercard_white, $font, esc_html($member_data['emailaddress'])); 
+                    imagettftext($dest, intval( $height * 0.03 ), 0, intval( $width * 0.05 ), intval( $height * 0.73 ), $membercard_white, $font, 'Member Since: '. esc_html($member_data['membersince'])); 
+                    imagettftext($dest, intval( $height * 0.025 ), 0, intval( $width * 0.05 ), intval( $height * 0.78 ), $membercard_white, $font, 'Valid Until: '. esc_html($member_data['expirationdate'])); 
 
                     $filename = 'id_' . $member_data['id'] . '_'.date("Y").'.jpg' ;
                     imagepng($dest, $temp_folder . $filename); //save id card in temp folder
                     
                     //now we have generated ID card, we can display it on browser or post it on Membercard
                     $url_image = $folder_url . $filename;
-                    $output .=  '<a href="'.$url_image.'" target="_blank" >';
-                    $output .=  '<img src="'.$url_image.'" width="450" > </a>'; //display saved id card
+                    $output .=  '<a href="'.esc_url($url_image).'" target="_blank" >';
+                    $output .=  '<img src="'.esc_url($url_image).'" width="450" > </a>'; //display saved id card
                     $output .=  '<br/>clink on the image above to save / download image in a new window';
                     
                     imagedestroy($dest);
@@ -168,7 +169,7 @@ function wpamms_shortcode_membercard() {
 	} elseif ( $search_mode ) {
 		// Message displayed if no members are found
                 $options = get_option( 'wpamms_options' );
-                $output .= '<br/>Please enter valid email address AND make sure that the membership account is still active.<br/><br/> Please contact membership help desk for assistance!<br/> ' . $options['membership_admin_email'] ;
+                $output .= '<br/>Please enter valid email address AND make sure that the membership account is still active.<br/><br/> Please contact membership help desk for assistance!<br/> ' . sanitize_email($options['membership_admin_email']) ;
 	}
 
 	// Return data prepared to replace shortcode on page/post
