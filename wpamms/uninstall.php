@@ -18,19 +18,19 @@ if ( is_multisite() ) {
 			switch_to_blog( $blog );
 
 			// Call function to delete amms table with prefix
-			amms_drop_table( $wpdb->get_blog_prefix() );
+			wpamms_drop_table( $wpdb->get_blog_prefix() );
 		}
 		switch_to_blog( $start_blog );
 		return;
 	}	
 }
 
-amms_drop_table( $wpdb->prefix );
+wpamms_drop_table( $wpdb->prefix );
 
-function amms_drop_table( $prefix ) {
+function wpamms_drop_table( $prefix ) {
 	global $wpdb;
-	$wpdb->query( $wpdb->prepare( 'DROP TABLE ' . $prefix . 'amms_members' ) );
-	$wpdb->query( $wpdb->prepare( 'DROP TABLE ' . $prefix . 'amms_renewal' ) );
+	$wpdb->query( 'DROP TABLE ' . $prefix . 'amms_members' );
+	$wpdb->query( 'DROP TABLE ' . $prefix . 'amms_renewal' );
 }
 
 // Check if options exist and delete them if present

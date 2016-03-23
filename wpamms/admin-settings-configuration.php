@@ -1,6 +1,6 @@
 <?php
 
-define( "VERSION", "1.0" );
+define( "WPAMMS_VERSION", "1.0" );
 
 // Register action hook function to be called when the admin pages are
 // starting to be prepared for display
@@ -41,7 +41,7 @@ function wpamms_adminsettings_init() {
 // Validation function to be called when data is posted by user
 // No validation done at this time. Straight return of values.
 function wpamms_validate_options( $input ) {
-	$input['version'] = VERSION;
+	$input['version'] = WPAMMS_VERSION;
 	return $input;
 }
 

@@ -6,15 +6,15 @@ add_action( 'admin_init', 'wpamms_adminrenewal_init' );
 // Register functions to be called when renewals are saved
 function wpamms_adminrenewal_init() {
 	add_action('admin_post_save_wpamms_renewal',
-		'process_wpamms_renewal');
+		'wpamms_process_renewal');
 
 	add_action('admin_post_delete_amms_renewal',
-		'delete_amms_renewal');
+		'wpamms_delete_renewal');
 }
 
 // Function to be called when new renewals are created or existing renewals
 // are saved
-function process_wpamms_renewal() {
+function wpamms_process_renewal() {
     $options = get_option( 'wpamms_options' );
 
 	// Check if user has proper security level
@@ -95,7 +95,7 @@ function process_wpamms_renewal() {
 }
 
 // Function to be called when deleting renewals
-function delete_amms_renewal() {
+function wpamms_delete_renewal() {
 
 	// Check that user has proper security level
 	if ( !current_user_can( 'manage_options' ) )

@@ -6,18 +6,18 @@ add_action( 'admin_init', 'wpamms_adminmembers_init' );
 // Register functions to be called when members are saved
 function wpamms_adminmembers_init() {
 	add_action('admin_post_save_wpamms_member',
-		'process_wpamms_member');
+		'wpamms_process_member');
 
 	add_action('admin_post_delete_amms_member',
-		'delete_amms_member');
+		'wpamms_delete_member');
 
 	add_action('admin_post_import_wpamms_members',
-		'import_wpamms_members');
+		'wpamms_import_members');
 }
 
 // Function to be called when new members are created or existing members
 // are saved
-function process_wpamms_member() {
+function wpamms_process_member() {
     $options = get_option( 'wpamms_options' );
 
 	// Check if user has proper security level
@@ -141,7 +141,7 @@ function process_wpamms_member() {
 }
 
 // Function to be called when deleting members
-function delete_amms_member() {
+function wpamms_delete_member() {
 	// Check that user has proper security level
 	if ( !current_user_can( 'manage_options' ) )
 		wp_die( 'Not allowed' );
@@ -168,7 +168,7 @@ function delete_amms_member() {
 }
 
 // Function to be called when importing members
-function import_wpamms_members() {
+function wpamms_import_members() {
 	// Check that user has proper security level
 	if ( !current_user_can( 'manage_options' ) )
 		wp_die( 'Not allowed' );

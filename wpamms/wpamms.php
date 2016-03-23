@@ -51,9 +51,9 @@ function wpamms_deactivate() {
 	wp_clear_scheduled_hook('my_daily_event');
 }
 
-add_action('my_daily_event', 'do_this_daily');
+add_action('my_daily_event', 'wpamms_do_this_daily');
 
-function do_this_daily() {
+function wpamms_do_this_daily() {
         $options = get_option( 'wpamms_options' );
 	global $wpdb;
 
@@ -232,10 +232,10 @@ require_once 'shortcode-member-registration.php';
 require_once 'shortcode-membercard.php';
 require_once 'shortcode-member-renewal.php';
 
-add_action('wp_enqueue_scripts', 'amms_load_scripts');
-add_action('admin_enqueue_scripts', 'amms_load_scripts');
+add_action('wp_enqueue_scripts', 'wpamms_load_scripts');
+add_action('admin_enqueue_scripts', 'wpamms_load_scripts');
 
-function amms_load_scripts() {
+function wpamms_load_scripts() {
     wp_enqueue_script('jquery');
     add_thickbox();
     wp_enqueue_script('jquery-ui-core');
@@ -245,10 +245,10 @@ function amms_load_scripts() {
     wp_enqueue_style('tiptip', plugins_url('tiptip/tipTip.css', __FILE__), array(), '1.3');
 }
 
-add_action('wp_footer', 'amms_footer_code');
-add_action('admin_footer', 'amms_footer_code');
+add_action('wp_footer', 'wpamms_footer_code');
+add_action('admin_footer', 'wpamms_footer_code');
 
-function amms_footer_code() {
+function wpamms_footer_code() {
             ?>
         <script type="text/javascript">
             function ammspopup(p1) {
