@@ -38,7 +38,7 @@ function wpamms_activate() {
 	// Create table on main blog in network mode or single blog
 	wpamms_create_table( $wpdb->get_blog_prefix() );
         wpamms_set_default_options();
-        wp_schedule_event(time(), 'daily', 'my_daily_event');
+        wp_schedule_event(time(), 'daily', 'wpamms_daily_event');
 
 }
 
@@ -48,10 +48,10 @@ register_activation_hook( __FILE__, 'wpamms_activate' );
 register_deactivation_hook( __FILE__, 'wpamms_deactivate' );
 
 function wpamms_deactivate() {
-	wp_clear_scheduled_hook('my_daily_event');
+	wp_clear_scheduled_hook('wpamms_daily_event');
 }
 
-add_action('my_daily_event', 'wpamms_do_this_daily');
+add_action('wpamms_daily_event', 'wpamms_do_this_daily');
 
 function wpamms_do_this_daily() {
         $options = get_option( 'wpamms_options' );
